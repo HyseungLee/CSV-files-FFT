@@ -2,13 +2,16 @@ import os
 import pandas as pd
 from pandas import DataFrame
 import csv
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
 
 class csv_files_post:
     def __init__(self, directory):
         self.directory = directory
         self.get_csv_files()
         self.print_info()
-        self.csv_read()
+        self.csv_data_set = self.csv_read()
 
     def get_csv_files(self):
         path = self.directory
@@ -28,10 +31,17 @@ class csv_files_post:
             for csv_file in self.file_list_csv:
 
                 data = pd.read_csv(self.directory + '/' + csv_file, names=['Time', 'Pressure'], engine='python', header=None)
-                new_data = data.drop(index=[0,1])
-                #lost_string = "Lost connection during download0.0"
-                new_data.iloc[0][0] = 0.0
 
+                df = data.drop(index=[0,1])
+                #lost_string = "Lost connection during download0.0"
+                df.iloc[0][0] = 0.0
+                #df = df.set_index('Time')
+                #df['Time'].round(1)
+                plt.xlabel('Time ($sec$)')
+                plt.ylabel('Amplitude ($Pa$)')
+                df.plot('Time','Pressure')
+                Y = np.fft.fft(df)
+                plt.plot(Y)
 
         except:
             print("csv 파일 읽기 오류 발생")
